@@ -9,13 +9,19 @@ package pacman;
  *
  * @author andresmovilla
  */
-public class Pacman {
+public class MainThread implements Runnable {
 
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main(String[] args) {
-		Main.init();
+	@Override
+	public void run() {
+		while(true) {
+			Main.movePlayer();
+			Main.moveEnemy();
+			try {
+				Thread.sleep(100);
+			} catch (Exception e) {
+				
+			}
+		}
 	}
 	
 }
