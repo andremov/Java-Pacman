@@ -15,15 +15,18 @@ import java.awt.image.BufferedImage;
  */
 public class MapNode {
 	
+	public static final int SIZE = 40;
 	private final boolean wall;
 	
 	private MapNode left;
 	private MapNode right;
 	private MapNode up;
 	private MapNode down;
+	private boolean food;
 
-	public MapNode(boolean wall) {
+	public MapNode(boolean wall, boolean food) {
 		this.wall = wall;
+		this.food = food;
 	}
 
 	/**
@@ -105,16 +108,36 @@ public class MapNode {
 		return (this.right == null) || (this.right.isWall());
 	}
 	
-	public BufferedImage getImage() {
-		BufferedImage img = new BufferedImage(15,15,BufferedImage.TYPE_INT_ARGB);
+	public BufferedImage getImage(boolean isPlayer, boolean isEnemy) {
+		BufferedImage img = new BufferedImage(SIZE,SIZE,BufferedImage.TYPE_INT_ARGB);
 		Graphics g = img.getGraphics();
 		
 		if (wall) {
 			g.setColor(Color.blue);
-			g.fillRect(0, 0, 15, 15);
+		} else {
+			g.setColor(Color.black);
 		}
+		g.fillRect(0, 0, SIZE, SIZE);
+		if (food) {
+			g.setColor(Color.yellow);
+			int r = SIZE/3;
+			int p = (SIZE/2)-(r/2);
+			g.fillOval(p,p,r,r);
+		}
+		if (isPlayer) {
+			g.setColor(java.awt.Color.red);
+			g.fillRect(5,5,MapNode.SIZE-10,MapNode.SIZE-10);
+		}
+							
 		
 		return img;
+	}
+
+	/**
+	 * @return the food
+	 */
+	public boolean isFood() {
+		return food;
 	}
 	
 }

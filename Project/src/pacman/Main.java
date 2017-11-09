@@ -21,20 +21,22 @@ public abstract class Main {
 	public static Map map;
 	
 	public static void init() {
-		
-		map = new Map();
-		
-		new Window();
+		map = new Map(15,10);
+//		System.out.println("!");
+		Window w = new Window();
+//		System.out.println("!!");
 		MainThread t = new MainThread();
+//		System.out.println("!?");
 		new Thread(t).start();
+		new Thread(w.d).run();
+//		System.out.println("started");
 	}
 	
 	public static void moveEnemy() {
 		
 	}
 	
-	
 	public static void movePlayer() {
-		
+		map.move(currentDirection, Map.ENTITY_PLAYER);
 	}
 }

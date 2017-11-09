@@ -17,7 +17,7 @@ public class MainThread implements Runnable {
 			Main.movePlayer();
 			Main.moveEnemy();
 			try {
-				Thread.sleep(100);
+				Thread.sleep(200);
 			} catch (Exception e) {
 				
 			}

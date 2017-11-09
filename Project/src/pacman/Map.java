@@ -24,15 +24,25 @@ public class Map {
 	MapNode enemy;
 	MapNode player;
 	
+	private int width;
+	private int height;
+	
+	
+	public Map(int width, int height) {
+		this.width = width;
+		this.height = height;
+		createMap();
+//		refreshImage();
+	}
+	
 	public void createMap() {
-		int width = 10;
-		int height = 10;
 		MapNode[][] mapMatrix = new MapNode[width][height];
 		Random rnd = new Random();
 		
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				mapMatrix[i][j] = new MapNode(rnd.nextInt()%2 == 1);
+				int roll = rnd.nextInt()%4;
+				mapMatrix[i][j] = new MapNode(roll == 1, roll == 2);
 			}
 		}
 		
@@ -53,16 +63,50 @@ public class Map {
 			}
 		}
 		
-		
-		BufferedImage img = new BufferedImage(15,15,BufferedImage.TYPE_INT_ARGB);
+		map = mapMatrix[0][0];
+		player = map;
+	}
+	
+//	public void refreshImage() {
+//		BufferedImage img = new BufferedImage(this.width*(MapNode.SIZE+1),this.height*(MapNode.SIZE+1),BufferedImage.TYPE_INT_ARGB);
+//		Graphics g = img.getGraphics();
+//		int x = 0;
+//		int y = 0;
+//		MapNode cur = map;
+//		MapNode nextY = map.getDown();
+//		while (nextY != null) {
+//			x = 0;
+//			while (cur != null) {
+//				g.drawImage(cur.getImage(), x*(MapNode.SIZE+1), y*(MapNode.SIZE+1), null);
+//				x++;
+//				cur = cur.getRight();
+//			}
+//			cur = nextY;
+//			nextY = cur.getDown();
+//			y++;
+//		}
+//		mapImage = img;
+//	}
+	
+	public BufferedImage getImg() {
+		BufferedImage img = new BufferedImage(this.width*(MapNode.SIZE+1),this.height*(MapNode.SIZE+1),BufferedImage.TYPE_INT_ARGB);
 		Graphics g = img.getGraphics();
-		
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				g.drawImage(mapMatrix[i][j].getImage(), j*15, i*15, null);
+		int x = 0;
+		int y = 0;
+		MapNode cur = map;
+		MapNode nextY = map.getDown();
+		while (nextY != null) {
+			x = 0;
+			while (cur != null) {
+				g.drawImage(cur.getImage(cur == player, cur == enemy), x*(MapNode.SIZE+1), y*(MapNode.SIZE+1), null);
+				x++;
+				cur = cur.getRight();
 			}
+			cur = nextY;
+			nextY = cur.getDown();
+			y++;
 		}
-		
+		return img;
 	}
 	
 	public void move(int moveDirection, int entityID) {
@@ -75,28 +119,28 @@ public class Map {
 				if (entity.canUp()) {
 					entity = entity.getUp();
 				} else {
-					System.out.println("WRONG MOVE");
+					System.out.println("WRONG MOVE: UP");
 				}
 				break;
 			case Main.DIRECTION_DOWN:
 				if (entity.canDown()) {
 					entity = entity.getDown();
 				} else {
-					System.out.println("WRONG MOVE");
+					System.out.println("WRONG MOVE: DOWN");
 				}
 				break;
 			case Main.DIRECTION_RIGHT:
 				if (entity.canRight()) {
 					entity = entity.getRight();
 				} else {
-					System.out.println("WRONG MOVE");
+					System.out.println("WRONG MOVE: RIGHT");
 				}
 				break;
 			case Main.DIRECTION_LEFT:
 				if (entity.canLeft()) {
 					entity = entity.getLeft();
 				} else {
-					System.out.println("WRONG MOVE");
+					System.out.println("WRONG MOVE: LEFT");
 				}
 				break;
 		}

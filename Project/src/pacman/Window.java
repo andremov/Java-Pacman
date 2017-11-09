@@ -13,23 +13,22 @@ import javax.swing.JFrame;
  */
 public class Window extends JFrame {
 
+	Display d;
+	
 	public Window() {
 		setLayout(null);
 		setSize(700, 600);
-		setTitle("Pacman");
+		setTitle("Pac-man");
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		
-		Display d = new Display(this);
+		d = new Display(this);
 		add(d);
 
-//		addKeyListener(new KeyHandler());
+		addKeyListener(new Input());
 
 		setVisible(true);
-		
-		new Thread(d).run();
 	}
 	
 	

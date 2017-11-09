@@ -28,9 +28,12 @@ public class Display extends Canvas implements Runnable {
 	public void run() {
 		createBufferStrategy(2);
 		while (true) {
+			
 			Graphics g = getBufferStrategy().getDrawGraphics();
 			g.clearRect(0, 0, getWidth(), getHeight());
-			g.drawImage(Main.map.mapImage, 0, 0, null);
+			g.drawImage(Main.map.getImg(), 0, 0, null);
+			getBufferStrategy().show();
+			
 			try {
 				Thread.sleep(100);
 			} catch (Exception e) { }
