@@ -37,7 +37,8 @@ public class Map {
 	
 	for (int i = 0; i < height; i++) {
 	    for (int j = 0; j < width; j++) {
-		mapMatrix[i][j] = new MapNode(mapData[i][j]==1, mapData[i][j] == 2);
+		int id = (i*height)+j;
+		mapMatrix[i][j] = new MapNode(id, mapData[i][j]==1, mapData[i][j] == 2);
 	    }
 	}
 
@@ -69,9 +70,11 @@ public class Map {
 	int x = 0;
 	int y = 0;
 	MapNode cur = map;
-	MapNode nextY = map.getDown();
+	MapNode nextY;
 	int trueS = (int)(MapNode.SIZE*SCALE);
+	
 	while (cur != null) {
+	    nextY = cur.getDown();
 	    x = 0;
 	    while (cur != null) {
 		g.drawImage(cur.getImage(cur == player, cur == enemy), x*trueS, y*trueS, trueS, trueS, null);
@@ -80,48 +83,45 @@ public class Map {
 		cur = cur.getRight();
 	    }
 	    cur = nextY;
-	    try {
-		nextY = cur.getDown();
-	    } catch (Exception e) { }
 	    y++;
 	}
+	
 	return img;
     }
 	
     public void move(int moveDirection, int entityID) {
-	MapNode entity = player;
-	if (entityID == ENTITY_ENEMY) {
+	MapNode entity = null;
+	if (entityID == ENTITY_PLAYER) {
+	    entity = player;
+	} else if (entityID == ENTITY_ENEMY) {
 	    entity = enemy;
 	}
 	switch(moveDirection) {
 	    case Main.DIRECTION_UP:
 		if (entity.canUp()) {
 		    entity = entity.getUp();
-		} else {
-//		    System.out.println("WRONG MOVE: UP");
 		}
 		break;
 	    case Main.DIRECTION_DOWN:
 		if (entity.canDown()) {
 		    entity = entity.getDown();
-		} else {
-//		    System.out.println("WRONG MOVE: DOWN");
 		}
 		break;
 	    case Main.DIRECTION_RIGHT:
 		if (entity.canRight()) {
 		    entity = entity.getRight();
-		} else {
-//		    System.out.println("WRONG MOVE: RIGHT");
 		}
 		break;
 	    case Main.DIRECTION_LEFT:
 		if (entity.canLeft()) {
 		    entity = entity.getLeft();
-		} else {
-//		    System.out.println("WRONG MOVE: LEFT");
 		}
 		break;
+	}
+	if (entityID == ENTITY_PLAYER) {
+	    player = entity;
+	} else if (entityID == ENTITY_ENEMY) {
+	    enemy = entity;
 	}
     }
 	

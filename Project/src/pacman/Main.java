@@ -32,6 +32,10 @@ public abstract class Main {
     public static Thread entityThread;
     public static Thread scoreThread;
     
+    public static final int TIMER_DISPLAY = 10;
+    public static final int TIMER_ENTITY = 150;
+    public static final int TIMER_SCORE = 800;
+    
 //    public static int[][] mapData;
     
     public static void init() {
@@ -65,10 +69,10 @@ public abstract class Main {
 	    public void run() {
 		while(true) {
 		    playerFrame = (playerFrame+1)%2;
-		    Main.movePlayer();
-		    Main.moveEnemy();
+		    movePlayer();
+		    moveEnemy();
 		    try {
-			Thread.sleep(200);
+			Thread.sleep(TIMER_ENTITY);
 		    } catch (Exception e) { }
 		}
 	    }
@@ -82,7 +86,7 @@ public abstract class Main {
 		while(true) {
 		    playerScore++;
 		    try {
-			Thread.sleep(800);
+			Thread.sleep(TIMER_SCORE);
 		    } catch (Exception e) { }
 		}
 	    }
@@ -91,6 +95,10 @@ public abstract class Main {
 	entityThread.start();
 	displayThread.start();
 	scoreThread.start();
+    }
+    
+    public static void setDirection (int newDir) {
+	currentDirection = newDir;
     }
     
     public static BufferedImage getPacman() {

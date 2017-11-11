@@ -19,10 +19,12 @@ public class MapNode {
     private MapNode up;
     private MapNode down;
     private boolean food;
+    public int i;
 
-    public MapNode(boolean wall, boolean food) {
+    public MapNode(int i, boolean wall, boolean food) {
 	this.wall = wall;
 	this.food = food;
+	this.i = i;
     }
 
     /**
@@ -89,19 +91,31 @@ public class MapNode {
     }
 
     public boolean canDown() {
-	return (this.down == null) || (this.down.isWall());
+	if (this.down == null)
+	    return false;
+	
+	return !this.down.isWall();
     }
 
     public boolean canUp() {
-	return (this.up == null) || (this.up.isWall());
+	if (this.up == null)
+	    return false;
+	
+	return !this.up.isWall();
     }
 	
     public boolean canLeft() {
-	return (this.left == null) || (this.left.isWall());
+	if (this.left == null)
+	    return false;
+	
+	return !this.left.isWall();
     }
 
     public boolean canRight() {
-	return (this.right == null) || (this.right.isWall());
+	if (this.right == null)
+	    return false;
+	
+	return !this.right.isWall();
     }
 
     public BufferedImage getImage(boolean isPlayer, boolean isEnemy) {
