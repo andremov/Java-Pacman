@@ -5,17 +5,13 @@
  */
 package pacman;
 
-/**
- *
- * @author andresmovilla
- */
 public class Pacman {
 
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main(String[] args) {
-		Main.init();
-	}
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+	Main.init();
+    }
 	
 }

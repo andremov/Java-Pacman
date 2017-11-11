@@ -9,10 +9,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-/**
- *
- * @author andresmovilla
- */
 public class MapNode {
 	
 	public static final int SIZE = 40;

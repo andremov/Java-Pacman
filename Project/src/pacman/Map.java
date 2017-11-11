@@ -9,10 +9,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-/**
- *
- * @author andresmovilla
- */
 public class Map {
 	
 	public static final int ENTITY_PLAYER = 0;
