@@ -5,6 +5,7 @@
  */
 package pacman;
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -12,6 +13,7 @@ public class Map {
 	
     public static final int ENTITY_PLAYER = 0;
     public static final int ENTITY_ENEMY = 1;
+    public static final float SCALE = 0.3f;
 
     public BufferedImage mapImage;
 
@@ -23,32 +25,24 @@ public class Map {
     private int height;
 
 
-    public Map(int width, int height) {
-	createMap();
+    public Map(int[][] mapData) {
+	height = mapData.length;
+	width = mapData[0].length;
+	createMap(mapData);
     }
 	
-    public void createMap() {
+    public void createMap(int[][] mapData) {
 
-	int[][] matrix = {
-	    {0,0,0,0,0,0,0,0,0,0,0,0,0},
-	    {0,1,1,1,1,1,1,1,1,1,1,2,0},
-	    {0,1,0,0,0,0,0,1,0,0,0,1,0},
-	    {0,2,1,1,1,1,1,1,0,1,1,1,0},
-	    {0,0,0,0,0,1,0,0,0,1,0,0,0},
-	    {0,1,1,1,1,1,1,1,1,1,1,1,1},
-	};
-	height = matrix.length;
-	width = matrix[0].length;
 	MapNode[][] mapMatrix = new MapNode[height][width];
 	
 	for (int i = 0; i < height; i++) {
 	    for (int j = 0; j < width; j++) {
-		mapMatrix[i][j] = new MapNode(matrix[i][j]==0, matrix[i][j] == 2);
+		mapMatrix[i][j] = new MapNode(mapData[i][j]==1, mapData[i][j] == 2);
 	    }
 	}
 
-	for (int i = 0; i < width; i++) {
-	    for (int j = 0; j < height; j++) {
+	for (int i = 0; i < height; i++) {
+	    for (int j = 0; j < width; j++) {
 		try {
 		    mapMatrix[i][j].setUp(mapMatrix[i-1][j]);
 		} catch (Exception e) { }
@@ -65,7 +59,8 @@ public class Map {
 	}
 
 	map = mapMatrix[0][0];
-	player = map;
+	player = mapMatrix[5][5];
+	enemy = mapMatrix[7][10];
     }
 
     public BufferedImage getImg() {
@@ -75,15 +70,19 @@ public class Map {
 	int y = 0;
 	MapNode cur = map;
 	MapNode nextY = map.getDown();
-	while (nextY != null) {
+	int trueS = (int)(MapNode.SIZE*SCALE);
+	while (cur != null) {
 	    x = 0;
 	    while (cur != null) {
-		g.drawImage(cur.getImage(cur == player, cur == enemy), x*MapNode.SIZE, y*MapNode.SIZE, null);
+		g.drawImage(cur.getImage(cur == player, cur == enemy), x*trueS, y*trueS, trueS, trueS, null);
+		g.setFont(new Font("Arial",Font.PLAIN,8));
 		x++;
 		cur = cur.getRight();
 	    }
 	    cur = nextY;
-	    nextY = cur.getDown();
+	    try {
+		nextY = cur.getDown();
+	    } catch (Exception e) { }
 	    y++;
 	}
 	return img;

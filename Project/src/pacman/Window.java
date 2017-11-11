@@ -7,6 +7,7 @@ package pacman;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -14,22 +15,16 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 
 public class Window extends JFrame {
-	
-    public Window() {
+    
+    public Window(int mapWidth, int mapHeight) {
 	setLayout(null);
-	setSize(700, 600);
+	int width = (int)(mapWidth*MapNode.SIZE*Map.SCALE);
+	int height = (int)((mapHeight+5)*MapNode.SIZE*Map.SCALE);
+	setSize(width,height);
 	setTitle("Pac-man");
 	setResizable(false);
 	setLocationRelativeTo(null);
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-	Canvas c = new Canvas();
-	c.setSize(getWidth()-2, getHeight()-24);
-	c.setLocation(1, 1);
-	c.setFocusable(false);
-	c.setBackground(Color.black);
-	c.setVisible(true);
-	add(c);
 
 	addKeyListener(new KeyListener() {
 	    
@@ -57,7 +52,19 @@ public class Window extends JFrame {
 
 	setVisible(true);
 
-	(new Thread() {
+    }
+	
+    public Thread init() {
+
+	Canvas c = new Canvas();
+	c.setSize(getWidth()-8, getHeight()-31);
+	c.setLocation(1, 1);
+	c.setFocusable(false);
+	c.setBackground(Color.black);
+	c.setVisible(true);
+	add(c);
+	
+	Thread t = (new Thread() {
 	    @Override
 	    public void run() {
 		c.createBufferStrategy(2);
@@ -66,17 +73,22 @@ public class Window extends JFrame {
 		    Graphics g = c.getBufferStrategy().getDrawGraphics();
 		    g.clearRect(0, 0, getWidth(), getHeight());
 		    BufferedImage img = Main.map.getImg();
-		    g.drawImage(img, 0, 0, img.getWidth()/4, img.getHeight()/4, null);
+		    g.drawImage(img, 0, 0, null);
+		    
+		    g.setColor(Color.white);
+		    g.setFont(new Font("Arial", Font.BOLD, 30));
+		    g.drawString("ALVARO ANAYA           Puntaje: "+Main.playerScore,10,450);
+		    
 		    c.getBufferStrategy().show();
-
+		    
 		    try {
 			Thread.sleep(100);
 		    } catch (Exception e) { }
 		}
 	    }
-	}).start();
+	});
+	
+	return t;
     }
-	
-	
 	
 }

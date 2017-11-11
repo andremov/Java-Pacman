@@ -114,6 +114,10 @@ public class MapNode {
 	    g.setColor(Color.black);
 	}
 	g.fillRect(0, 0, SIZE, SIZE);
+	if (food && isPlayer) {
+	    food = false;
+	    Main.playerScore += 10;
+	}
 	if (food) {
 	    g.setColor(Color.yellow);
 	    int r = SIZE/3;
@@ -122,8 +126,9 @@ public class MapNode {
 	}
 	if (isPlayer) {
 	    g.drawImage(Main.getPacman(),0,0,null);
-//	    g.setColor(java.awt.Color.red);
-//	    g.fillRect(5,5,MapNode.SIZE-10,MapNode.SIZE-10);
+	}
+	if (isEnemy) {
+	    g.drawImage(Main.getGhost(),0,0,null);
 	}
 
 	return img;
