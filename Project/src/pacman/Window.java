@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 
 public class Window extends JFrame {
@@ -59,13 +60,14 @@ public class Window extends JFrame {
 	(new Thread() {
 	    @Override
 	    public void run() {
-		createBufferStrategy(2);
+		c.createBufferStrategy(2);
 		while (true) {
 
-		    Graphics g = getBufferStrategy().getDrawGraphics();
+		    Graphics g = c.getBufferStrategy().getDrawGraphics();
 		    g.clearRect(0, 0, getWidth(), getHeight());
-		    g.drawImage(Main.map.getImg(), 0, 0, null);
-		    getBufferStrategy().show();
+		    BufferedImage img = Main.map.getImg();
+		    g.drawImage(img, 0, 0, img.getWidth()/4, img.getHeight()/4, null);
+		    c.getBufferStrategy().show();
 
 		    try {
 			Thread.sleep(100);
