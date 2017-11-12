@@ -8,16 +8,16 @@ package pacman;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class MapNode {
 
     public static final int SIZE = 88;
     private final boolean wall;
-
-    private MapNode left;
-    private MapNode right;
-    private MapNode up;
-    private MapNode down;
+    
+    private ArrayList<Path> paths;
+    
+    private MapNode[] directions;
     private boolean food;
     public int i;
 
@@ -25,6 +25,8 @@ public class MapNode {
 	this.wall = wall;
 	this.food = food;
 	this.i = i;
+	paths = new ArrayList<>();
+	directions = new MapNode[4];
     }
 
     /**
@@ -33,89 +35,93 @@ public class MapNode {
     public boolean isWall() {
 	return wall;
     }
-
+    
+    public MapNode getNext(int direction) {
+	return directions[direction];
+    }
+    
     /**
      * @return the left
      */
     public MapNode getLeft() {
-	return left;
+	return directions[Main.DIRECTION_LEFT];
     }
 
     /**
     * @param left the left to set
     */
    public void setLeft(MapNode left) {
-       this.left = left;
+       this.directions[Main.DIRECTION_LEFT] = left;
    }
 
    /**
     * @return the right
     */
    public MapNode getRight() {
-       return right;
+       return directions[Main.DIRECTION_RIGHT];
    }
 
    /**
     * @param right the right to set
     */
    public void setRight(MapNode right) {
-       this.right = right;
+       this.directions[Main.DIRECTION_RIGHT] = right;
    }
 
     /**
      * @return the up
      */
     public MapNode getUp() {
-	return up;
+	return directions[Main.DIRECTION_UP];
     }
 
     /**
      * @param up the up to set
      */
     public void setUp(MapNode up) {
-	this.up = up;
+	this.directions[Main.DIRECTION_UP] = up;
     }
 
     /**
      * @return the down
      */
     public MapNode getDown() {
-	return down;
+	return directions[Main.DIRECTION_DOWN];
     }
 
     /**
      * @param down the down to set
      */
     public void setDown(MapNode down) {
-	this.down = down;
+	this.directions[Main.DIRECTION_DOWN] = down;
     }
 
     public boolean canDown() {
-	if (this.down == null)
+	if (this.directions[Main.DIRECTION_DOWN] == null)
 	    return false;
 	
-	return !this.down.isWall();
+	return !this.directions[Main.DIRECTION_DOWN].isWall();
     }
 
     public boolean canUp() {
-	if (this.up == null)
+	if (this.directions[Main.DIRECTION_UP] == null)
 	    return false;
 	
-	return !this.up.isWall();
+	return !this.directions[Main.DIRECTION_UP].isWall();
     }
 	
     public boolean canLeft() {
-	if (this.left == null)
+	if (this.directions[Main.DIRECTION_LEFT] == null)
 	    return false;
 	
-	return !this.left.isWall();
+	return !this.directions[Main.DIRECTION_LEFT].isWall();
     }
 
     public boolean canRight() {
-	if (this.right == null)
+	if (this.directions[Main.DIRECTION_RIGHT] == null)
 	    return false;
 	
-	return !this.right.isWall();
+	return !this.directions[Main.DIRECTION_RIGHT].isWall();
     }
 
     public BufferedImage getImage(boolean isPlayer, boolean isEnemy) {
@@ -128,10 +134,6 @@ public class MapNode {
 	    g.setColor(Color.black);
 	}
 	g.fillRect(0, 0, SIZE, SIZE);
-	if (food && isPlayer) {
-	    food = false;
-	    Main.playerScore += 10;
-	}
 	if (food) {
 	    g.setColor(Color.yellow);
 	    int r = SIZE/3;
@@ -153,6 +155,34 @@ public class MapNode {
      */
     public boolean isFood() {
 	return food;
+    }
+
+    /**
+     * @param food the food to set
+     */
+    public void setFood(boolean food) {
+	this.food = food;
+    }
+
+    /**
+     * @return the paths
+     */
+    public Path getPathTo(int id) {
+	for (int j = 0; j < paths.size(); j++) {
+	    if (paths.get(j).goal == id) {
+		return paths.get(j);
+	    }
+	}
+	return null;
+    }
+    
+    public void addPathTo(Path p) {
+	for (int j = 0; j < paths.size(); j++) {
+	    if (paths.get(j).goal == p.goal) {
+		paths.remove(j);
+	    }
+	}
+	paths.add(p);
     }
 
 }

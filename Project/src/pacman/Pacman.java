@@ -7,9 +7,6 @@ package pacman;
 
 public class Pacman {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
 	Main.init();
     }

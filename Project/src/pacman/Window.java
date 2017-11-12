@@ -51,7 +51,6 @@ public class Window extends JFrame {
 	});
 
 	setVisible(true);
-
     }
 	
     public Thread init() {
@@ -78,7 +77,13 @@ public class Window extends JFrame {
 		    g.setColor(Color.white);
 		    g.setFont(new Font("Arial", Font.BOLD, 30));
 		    g.drawString("ALVARO ANAYA           Puntaje: "+Main.playerScore,10,450);
-		    
+		    if (Main.gameEnd) {
+			String a = "Ganó!";
+			if (!Main.playerWon) {
+			    a = "Perdió :(";
+			}
+			g.drawString(a,10,480);
+		    }
 		    c.getBufferStrategy().show();
 		    
 		    try {

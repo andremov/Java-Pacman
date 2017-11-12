@@ -8,7 +8,9 @@ package pacman;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import javax.imageio.ImageIO;
 
 public abstract class Main {
@@ -24,7 +26,11 @@ public abstract class Main {
     public static int currentDirection = 1;
     public static int lastGhostMove = 1;
     public static int playerFrame = 0;
+    
     public static Map map;
+    public static Window w;
+    
+    public static int remainingFood;
     
     public static long playerScore;
 
@@ -36,9 +42,58 @@ public abstract class Main {
     public static final int TIMER_ENTITY = 150;
     public static final int TIMER_SCORE = 800;
     
-//    public static int[][] mapData;
+    public static ArrayList<MapNode> foodStack;
+    
+    public static boolean gameEnd;
+    public static boolean playerWon;
     
     public static void init() {
+	loadData();
+	gameEnd = false;
+	playerWon = false;
+	
+	buildFoodStack(map);
+	for (int i = 0; i < 10; i++) {
+	    remainingFood++;
+	    nextFood();
+	}
+	
+	playerScore = 0;
+	
+	createThreads();
+	
+	map.buildPaths();
+	
+	entityThread.start();
+	displayThread.start();
+	scoreThread.start();
+    }
+    
+    public static void buildFoodStack(Map map) {
+	ArrayList<MapNode> list = map.allNodes();
+	for (int i = list.size()-1; i >= 0; i--) {
+	    if (list.get(i).isWall()) {
+		list.remove(i);
+	    }
+	}
+	Random r = new Random();
+	for (int i = 0; i < list.size()-1; i++) {
+	    int numberSwaps = list.size()-i;
+	    int swapIndex = r.nextInt(numberSwaps)+i;
+	    MapNode temp = list.get(i);
+	    list.set(i, list.get(swapIndex));
+	    list.set(swapIndex,temp);
+	}
+	foodStack = list;
+    }
+    
+    public static void nextFood() {
+	MapNode next = foodStack.remove(0);
+	next.setFood(true);
+	foodStack.add(next);
+    }
+    
+    public static void loadData() {
 	
 	try {
 	    pacmanSprites = ImageIO.read(new File("imgs/pacman.png"));
@@ -61,7 +116,10 @@ public abstract class Main {
 	
 	map = new Map(mapData);
 	
-	Window w = new Window(mapData[0].length, mapData.length);
+	w = new Window(mapData[0].length, mapData.length);
+    }
+    
+    public static void createThreads() {
 	displayThread = w.init();
 	
 	entityThread = new Thread() {
@@ -69,16 +127,16 @@ public abstract class Main {
 	    public void run() {
 		while(true) {
 		    playerFrame = (playerFrame+1)%2;
-		    movePlayer();
-		    moveEnemy();
+
+		    map.moveEnemy();
+		    map.movePlayer(currentDirection);
+		    
 		    try {
 			Thread.sleep(TIMER_ENTITY);
 		    } catch (Exception e) { }
 		}
 	    }
 	};
-	
-	playerScore = 0;
 	
 	scoreThread = new Thread() {
 	    @Override
@@ -91,10 +149,19 @@ public abstract class Main {
 		}
 	    }
 	};
-	
-	entityThread.start();
-	displayThread.start();
-	scoreThread.start();
+    }
+    
+    public static void checkEnd() {
+	if (remainingFood == 0) {
+	    playerWon = true;
+	    endGame();
+	}
+    }
+    
+    public static void endGame() {
+	gameEnd = true;
+	scoreThread.interrupt();
+	entityThread.interrupt();
     }
     
     public static void setDirection (int newDir) {
@@ -129,13 +196,5 @@ public abstract class Main {
 	int frameX = playerFrame*88;
 	
 	return ghostSprites.getSubimage(frameX+directionX, directionY, 88, 88);
-    }
-
-    public static void moveEnemy() {
-
-    }
-
-    public static void movePlayer() {
-	map.move(currentDirection, Map.ENTITY_PLAYER);
     }
 }
