@@ -39,33 +39,39 @@ public abstract class Main {
     public static Thread scoreThread;
     
     public static final int TIMER_DISPLAY = 10;
-    public static final int TIMER_ENTITY = 150;
-    public static final int TIMER_SCORE = 800;
+    public static final int TIMER_ENTITY = 400;
+    public static final int TIMER_SCORE = 200;
     
     public static ArrayList<MapNode> foodStack;
     
     public static boolean gameEnd;
     public static boolean playerWon;
     
+    public static boolean loading;
+    
     public static void init() {
+	loading = true;
 	loadData();
 	gameEnd = false;
 	playerWon = false;
 	
-	buildFoodStack(map);
+//	buildFoodStack(map);
 	for (int i = 0; i < 10; i++) {
 	    remainingFood++;
-	    nextFood();
+//	    nextFood();
 	}
 	
 	playerScore = 0;
 	
 	createThreads();
 	
+	displayThread.start();
+	
 	map.buildPaths();
 	
+	loading = false;
+	
 	entityThread.start();
-	displayThread.start();
 	scoreThread.start();
     }
     
@@ -126,6 +132,7 @@ public abstract class Main {
 	    @Override
 	    public void run() {
 		while(true) {
+		    Main.checkEnd();
 		    playerFrame = (playerFrame+1)%2;
 
 		    map.moveEnemy();
@@ -155,13 +162,16 @@ public abstract class Main {
 	if (remainingFood == 0) {
 	    playerWon = true;
 	    endGame();
+	} else if (map.checkLost()) {
+	    playerWon = false;
+	    endGame();
 	}
     }
     
     public static void endGame() {
 	gameEnd = true;
-	scoreThread.interrupt();
-	entityThread.interrupt();
+	scoreThread.stop();
+	entityThread.stop();
     }
     
     public static void setDirection (int newDir) {

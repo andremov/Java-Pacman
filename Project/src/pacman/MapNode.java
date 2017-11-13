@@ -19,12 +19,17 @@ public class MapNode {
     
     private MapNode[] directions;
     private boolean food;
-    public int i;
+    
+    public int id;
+    public int x;
+    public int y;
 
-    public MapNode(int i, boolean wall, boolean food) {
+    public MapNode(int i, boolean wall, boolean food, int x, int y) {
 	this.wall = wall;
 	this.food = food;
-	this.i = i;
+	this.id = i;
+	this.x = x;
+	this.y = y;
 	paths = new ArrayList<>();
 	directions = new MapNode[4];
     }
@@ -164,9 +169,6 @@ public class MapNode {
 	this.food = food;
     }
 
-    /**
-     * @return the paths
-     */
     public Path getPathTo(int id) {
 	for (int j = 0; j < paths.size(); j++) {
 	    if (paths.get(j).goal == id) {
@@ -176,13 +178,27 @@ public class MapNode {
 	return null;
     }
     
-    public void addPathTo(Path p) {
+    public ArrayList<Path> getPaths() {
+	return paths;
+    }
+    
+    public boolean addPath(Path p) {
+	boolean canAdd = true;
 	for (int j = 0; j < paths.size(); j++) {
 	    if (paths.get(j).goal == p.goal) {
-		paths.remove(j);
+		Path c = paths.get(j);
+		if (c.length > p.length) {
+		    paths.remove(j);
+		} else {
+		    canAdd = false;
+		}
 	    }
 	}
-	paths.add(p);
+	if (canAdd) {
+	    paths.add(p);
+	    return true;
+	}
+	return false;
     }
 
 }

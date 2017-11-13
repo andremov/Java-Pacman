@@ -13,7 +13,8 @@ import java.util.ArrayList;
 public class Map {
 
     public static final float SCALE = 0.3f;
-
+    public static int TRUE_SIZE;
+    
     public BufferedImage mapImage;
 
     private MapNode map;
@@ -24,6 +25,7 @@ public class Map {
     private int height;
 
     public Map(int[][] mapData) {
+	TRUE_SIZE = (int)(SCALE*MapNode.SIZE);
 	height = mapData.length;
 	width = mapData[0].length;
 	createMap(mapData);
@@ -45,92 +47,91 @@ public class Map {
 	return all;
     }
     
-    private void findPathsForVertex(ArrayList<MapNode> nodes, int a) {
+    private void findBasicPathsForVertex(MapNode v) {
+	if (v.canDown()) {
+	    v.addPath(new Path(v.getDown().id,1,Main.DIRECTION_DOWN));
+	}
+	if (v.canLeft()) {
+	    v.addPath(new Path(v.getLeft().id,1,Main.DIRECTION_LEFT));
+	}
+	if (v.canRight()) {
+	    v.addPath(new Path(v.getRight().id,1,Main.DIRECTION_RIGHT));
+	}
+	if (v.canUp()) {
+	    v.addPath(new Path(v.getUp().id,1,Main.DIRECTION_UP));
+	}
+    }
+    
+    public void createMatrix(ArrayList<MapNode> nodes) {
+	int N = nodes.size();
 	
-	boolean[] donePaths = new boolean[nodes.size()];
-
-	for (int j = 0; j < nodes.size(); j++)
-	    donePaths[j] = false;
-
-	boolean done = false;
-	int it = 0;
-	int goalID = nodes.get(it).i;
-	MapNode start = nodes.get(a);
-	
-	while (!done) {
-//	    System.out.println("  connection to "+nodes.get(it).i);
-	    if (start.getPathTo(goalID) == null && goalID != start.i) {
-		
-		// ONE STEP
-		if (start.getDown().i == goalID) {
-//		    System.out.println("    done!");
-		    start.addPathTo(new Path(goalID,1,Main.DIRECTION_DOWN));
-		    donePaths[goalID] = true;
-		}
-		if (start.getLeft().i == goalID) {
-//		    System.out.println("    done!");
-		    start.addPathTo(new Path(goalID,1,Main.DIRECTION_LEFT));
-		    donePaths[goalID] = true;
-		}
-		if (start.getRight().i == goalID) {
-//		    System.out.println("    done!");
-		    start.addPathTo(new Path(goalID,1,Main.DIRECTION_RIGHT));
-		    donePaths[goalID] = true;
-		}
-		if (start.getUp().i == goalID) {
-//		    System.out.println("    done!");
-		    start.addPathTo(new Path(goalID,1,Main.DIRECTION_UP));
-		    donePaths[goalID] = true;
-		}
-		
-		int currentPathIndex = -1;
-		int currentLength = nodes.size()+1;
-		int direction = -1;
-		for (int j = 0; j < nodes.size(); j++) {
-		    if (start.getPathTo(j) != null) {
-			MapNode midVertex = nodes.get(j);
-			if (midVertex.getPathTo(goalID) != null) {
-			    int possibleLength = start.getPathTo(j).length + midVertex.getPathTo(goalID).length - 1;
-			    if (possibleLength < currentLength) {
-				currentPathIndex = j;
-				currentLength = possibleLength;
-				direction = start.getPathTo(j).direction;
+        for (int i = 0; i < N; i++) {
+	    System.out.println("Haciendo "+i+"...");
+            boolean[] allDone = new boolean[N];
+            for (int k = 0; k < N; k++) {
+                allDone[k] = false;
+            }
+			
+            boolean done = false;
+            int search = 0;
+	    int searchID;
+            while (!done) {
+                allDone[search] = true;
+		searchID = nodes.get(search).id;
+                if (search != i) {
+                    MapNode place = nodes.get(i);
+                    int currentCost = 100;
+//                    for (int k = 0; k < place.getPaths().size(); k++) {
+                        if (place.getPathTo(searchID) != null) {
+                            currentCost = place.getPathTo(searchID).length;
+                        }
+//                    }
+					
+                    for (int k = 0; k < place.getPaths().size(); k++) {
+			MapNode middle = null;
+			int toMidCost = -1;
+			int toMidDir = -1;
+			for (int j = 0; j < N; j++) {
+			    if (nodes.get(j).id == place.getPaths().get(k).goal) {
+				middle = nodes.get(j);
+				toMidCost = place.getPaths().get(k).length;
+				toMidDir = place.getPaths().get(k).direction;
+				break;
 			    }
 			}
-		    }
-		}
-
-		if (currentPathIndex != -1) {
-		    start.addPathTo(new Path(goalID,currentLength,direction));
-		    donePaths[goalID] = true;
-		}
-	    } else {
-//		System.out.println("    done!");
-		donePaths[goalID] = true;
-	    }
-
-	    it++;
-	    if (it == nodes.size()) {
-		it = 0;
-		done = true;
-		int missing = 0;
-		for (int k = 0; k < nodes.size(); k++) {
-		    if (!donePaths[k]) {
-			done = false;
-			missing++;
-		    }
-		}
-
-		if (!done) {
-		    System.out.println("Paths not finished!");
-		    System.out.println("Missing: "+missing+"/"+nodes.size());
-		    for (int k = 0; k < nodes.size(); k++) {
-			donePaths[k] = false;
-		    }
-		}
-	    }
-	    goalID = nodes.get(it).i;
-	}
+			
+			for (int l = 0; l < middle.getPaths().size(); l++) {
+			    if (middle.getPaths().get(l).goal == searchID) {
+				int toGoalCost = middle.getPaths().get(l).length;
+				int newCost = toMidCost + toGoalCost;
+				if (newCost < currentCost) {
+				    place.addPath(new Path(searchID,newCost,toMidDir));
+				    allDone[search] = false;
+				}
+			    }
+			}
+                    }
+                }
+                
+				
+                search++;
+                if (search == N) {
+                    search = 0;
+                    done = true;
+                    for (int k = 0; k < N; k++) {
+                        if (!allDone[k]) {
+                            done = false;
+                        }
+                    }
+					
+                    if (!done) {
+                        for (int k = 0; k < N; k++) {
+                            allDone[k] = false;
+                        }
+                    }
+                }
+            }
+        }
     }
     
     public void buildPaths() {
@@ -141,19 +142,19 @@ public class Map {
 	    }
 	}
 	for (int i = 0; i < nodes.size(); i++) {
-	    System.out.println("Building paths for "+nodes.get(i).i+"...");
-	    findPathsForVertex(nodes,i);
+	    findBasicPathsForVertex(nodes.get(i));
 	}
+	createMatrix(nodes);
     }
 	
     public void createMap(int[][] mapData) {
 
 	MapNode[][] mapMatrix = new MapNode[height][width];
-	
+	int id = 0;
 	for (int i = 0; i < height; i++) {
-	    for (int j = 0; j < width; j++) {
-		int id = (i*height)+j;
-		mapMatrix[i][j] = new MapNode(id, mapData[i][j]==1, mapData[i][j] == 2);
+	    for (int j = 0; j < width; j++) {	
+		mapMatrix[i][j] = new MapNode(id, mapData[i][j]==1, mapData[i][j] == 2, j, i);
+		id++;
 	    }
 	}
 
@@ -175,44 +176,40 @@ public class Map {
 	}
 
 	map = mapMatrix[0][0];
-	player = mapMatrix[5][5];
-	enemy = mapMatrix[7][10];
+	player = mapMatrix[7][11];
+	enemy = mapMatrix[13][9];
     }
 
     public BufferedImage getImg() {
 	BufferedImage img = new BufferedImage(this.width*MapNode.SIZE,this.height*MapNode.SIZE,BufferedImage.TYPE_INT_ARGB);
 	Graphics g = img.getGraphics();
-	int x = 0;
-	int y = 0;
 	MapNode cur = map;
 	MapNode nextY;
-	int trueS = (int)(MapNode.SIZE*SCALE);
 	
 	while (cur != null) {
 	    nextY = cur.getDown();
-	    x = 0;
 	    while (cur != null) {
 		if (cur.isFood() && cur == player) {
 		    cur.setFood(false);
 		    Main.remainingFood--;
-		    Main.checkEnd();
 //		    Main.nextFood();
 		    Main.playerScore += 10;
 		}
-		g.drawImage(cur.getImage(cur == player, cur == enemy), x*trueS, y*trueS, trueS, trueS, null);
-		g.setFont(new Font("Arial",Font.PLAIN,8));
-		x++;
+		g.drawImage(cur.getImage(cur == player, cur == enemy), cur.x*TRUE_SIZE, cur.y*TRUE_SIZE, TRUE_SIZE, TRUE_SIZE, null);
 		cur = cur.getRight();
 	    }
 	    cur = nextY;
-	    y++;
 	}
 	
 	return img;
     }
     
     public void moveEnemy() {
-	enemy = enemy.getNext(enemy.getPathTo(player.i).direction);
+	enemy = enemy.getNext(enemy.getPathTo(player.id).direction);
+    }
+    
+    public boolean checkLost() {
+	return enemy == player;
     }
     
     public void movePlayer(int moveDirection) {

@@ -71,18 +71,25 @@ public class Window extends JFrame {
 
 		    Graphics g = c.getBufferStrategy().getDrawGraphics();
 		    g.clearRect(0, 0, getWidth(), getHeight());
-		    BufferedImage img = Main.map.getImg();
-		    g.drawImage(img, 0, 0, null);
 		    
-		    g.setColor(Color.white);
-		    g.setFont(new Font("Arial", Font.BOLD, 30));
-		    g.drawString("ALVARO ANAYA           Puntaje: "+Main.playerScore,10,450);
-		    if (Main.gameEnd) {
-			String a = "Ganó!";
-			if (!Main.playerWon) {
-			    a = "Perdió :(";
+		    if (Main.loading) {
+			g.setColor(Color.white);
+			g.setFont(new Font("Arial",Font.BOLD,50));
+			g.drawString("Cargando",200,350);
+		    } else {
+			BufferedImage img = Main.map.getImg();
+			g.drawImage(img, 0, 0, null);
+
+			g.setColor(Color.white);
+			g.setFont(new Font("Arial", Font.BOLD, 30));
+			g.drawString("ALVARO ANAYA           Puntaje: "+Main.playerScore,10,450);
+			if (Main.gameEnd) {
+			    String a = "Ganó!";
+			    if (!Main.playerWon) {
+				a = "Perdió :(";
+			    }
+			    g.drawString(a,10,480);
 			}
-			g.drawString(a,10,480);
 		    }
 		    c.getBufferStrategy().show();
 		    

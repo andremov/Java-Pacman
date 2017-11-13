@@ -10,7 +10,7 @@ public class Path {
     int goal;
     int length;
     int direction;
-
+    
     public Path(int goal, int length, int direction) {
 	this.goal = goal;
 	this.length = length;
